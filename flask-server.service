@@ -1,0 +1,11 @@
+[Unit]
+Description=Flask API server
+After=network.target
+
+[Service]
+User=py
+ExecStart=/usr/bin/python3 /projekt/server.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
