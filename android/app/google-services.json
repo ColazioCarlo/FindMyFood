@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "602443385009",
+    "project_id": "test1-708b2",
+    "storage_bucket": "test1-708b2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:602443385009:android:c2e59fea94ae674edd3a90",
+        "android_client_info": {
+          "package_name": "com.example.findmyfood"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw3xvV04z1LYFenTUTRBBzd6vMYSO8S0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
