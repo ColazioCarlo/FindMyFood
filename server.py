@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
@@ -44,6 +45,31 @@ def token_required(f):
         return f(current_user, *args, **kwargs)
     return decorated
 
+@app.route('/register', methods=['POST'])
+def register():
+    # Primi JSON podatke iz requesta
+    data = request.get_json()
+
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({'message': 'Username and password are required'}), 400
+
+    username = data['username']
+    password = data['password']
+
+    # Provjera je li korisnik vec u bazi podataka
+    if User.query.filter_by(username=username).first():
+        return jsonify({'message': 'User already exists'}), 409
+
+    # Hashaj lozinku pomocu generate_password_hash,
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+
+    # Kreiraj novog korisnika s hashanom lozinkom te dodaj u bazu
+    new_user = User(username=username, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+
+    return jsonify({'message': 'User registered successfully'}), 201
+
 # Vraca token response na rutu ako su credentialsi dobri
 @app.route('/login', methods=['POST'])
 def login():
@@ -57,7 +83,7 @@ def login():
 
     # Query za korisnika u MySQL bazi s danim usernameom
     user = User.query.filter_by(username=username).first()
-    if user and user.password == password:
+    if user and check_password_hash(user.password, password):
         # Enkodiraj token u trajanju od 4h (privremeno dok se ne implementiraju access i refresh tokeni)
         token = jwt.encode({
             'user': username,
