@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ=='
 
 # Updateat URI po vlastitim MySQL credentialsima i imenom baze podataka
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://user:password@localhost/users'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://FindMyFood:findmyfood@localhost/FindMyFood'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicijalizacija baze podataka
