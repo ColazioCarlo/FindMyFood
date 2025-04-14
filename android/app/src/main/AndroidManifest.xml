@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="findmyfood"
+        android:label="find_my_food"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

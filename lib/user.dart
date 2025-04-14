@@ -16,5 +16,3 @@ class UserModel {
 
 
 }
-
-//sta sve treba iz jsona izvadit idk

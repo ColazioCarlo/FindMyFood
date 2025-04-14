@@ -1,6 +1,6 @@
-# findmyfood
+# find_my_food
 
-Official FindMyFood project.
+A new Flutter project.
 
 ## Getting Started
 
