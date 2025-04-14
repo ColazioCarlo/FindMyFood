@@ -1,0 +1,2 @@
+C:/Users/oolrak/StudioProjects/find_my_food/android/app/.cxx/Debug/s5ck3bj3/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/oolrak/StudioProjects/find_my_food/android/app/.cxx/Debug/s5ck3bj3/arm64-v8a/CMakeFiles/rebuild_cache.dir
