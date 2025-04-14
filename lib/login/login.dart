@@ -1,105 +1,98 @@
-import 'package:findmyfood/auth.dart';
-import 'package:findmyfood/home.dart';
 import 'package:flutter/material.dart';
+import 'package:find_my_food/auth.dart';
+import 'package:find_my_food/home.dart';
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key});
 
   @override
-  State<MyLoginPage> createState() => _MyLoginPageState();
+  State<MyLoginPage> createState() => _MyLoginPageState(); //kreira
 }
 
 class _MyLoginPageState extends State<MyLoginPage> {
+  final _loginKey = GlobalKey<FormState>(); //drzi login key
 
-  final _loginKey = GlobalKey<FormState>();
-
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController(); //uzimaju user i pass iz tekstnih polja
   final TextEditingController _passwordController = TextEditingController();
 
   @override
-  void dispose() {
-    _passwordController.dispose();
+  void dispose() { //mice widgete
     _usernameController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
+  Future<void> _handleLogin() async {
+    if (_loginKey.currentState!.validate()) { //ako ima login key -> poziva login funkciju iz auth.dart
+      AuthService authService = AuthService();
+
+      final user = await authService.login(
+        _usernameController.text,
+        _passwordController.text,
+        context,
+      );
+
+      if (user != null) { //ako je login uspjesan -> prebaci na home page
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage(user: user)),
+              (route) => false,
+        );
+      }
+    } else { //ako je neuspjesan -> ispisi u snackbaru
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+  Widget build(BuildContext context) { //dizajn widgeta
     return Scaffold(
-      body: Container(
-        height: double.infinity,
-        width: double.infinity,
-        key: _loginKey,
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 200),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _loginKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                 TextFormField(
-                    controller: _usernameController,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),labelText: "Username"),
-                    validator: (value){
-                      if (value == null|| value.length < 6) {
-                        return 'Please enter a valid username';
-                      }
-                      return null;
-                    },
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Username",
                   ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextFormField(
-                    controller: _passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(), labelText: "Password"),
-                    validator: (value) {
-                      if (value == null || value.length < 6) {
-                        return 'Please enter a valid password';
-                      }
-                      return null;
-                    },
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-
-                InkResponse(
-                  onTap: () async {
-                    if (_loginKey.currentState!.validate()) {
-                      AuthService authService = AuthService();
-
-                      final user = await authService.login(
-                          _usernameController.text, _passwordController.text);
-
-                      if(user!=null){
-
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>MyHomePage(user: user,)), (route) => false);
-
-                      }
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a valid username';
                     }
+                    return null;
                   },
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (_loginKey.currentState!.validate()) {
-                        // Navigate the user to the Home page
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Please fill input')),
-                        );
-                      }
-                    },
-                    child: const Text('Login'),
-
-                  ),
                 ),
-            ]
-          )
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Password",
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a valid password';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _handleLogin,
+                  child: const Text('Login'),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

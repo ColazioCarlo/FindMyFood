@@ -1,4 +1,5 @@
-import 'package:findmyfood/user.dart';
+import 'package:find_my_food/auth.dart';
+import 'package:find_my_food/user.dart';
 import 'package:flutter/material.dart';
 
 
@@ -11,15 +12,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Hi ${widget.user!.username}"),
+          title: Text("Hi ${authService.username}"),
         ),
     );
   }
 }
 
-//ovo je home screen nakon logina, zasad pametnom dosta
+//ovo je home screen nakon logina, W.I.P.

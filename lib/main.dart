@@ -1,4 +1,4 @@
-import 'package:findmyfood/login/login.dart';
+import 'package:find_my_food/login/login.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -8,7 +8,7 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // ovo ce da bude glavi file nez dal cemo ista radit s ovim
+
   @override
   Widget build(BuildContext context) {
     const appTitle = 'FindMyFood';
