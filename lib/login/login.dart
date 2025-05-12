@@ -1,45 +1,44 @@
+// lib/login/login.dart
+
 import 'package:flutter/material.dart';
 import 'package:find_my_food/auth.dart';
 import 'package:find_my_food/home.dart';
+import 'package:find_my_food/login/register.dart';  // ← re‑add
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key});
 
   @override
-  State<MyLoginPage> createState() => _MyLoginPageState(); //kreira
+  State<MyLoginPage> createState() => _MyLoginPageState();
 }
 
 class _MyLoginPageState extends State<MyLoginPage> {
-  final _loginKey = GlobalKey<FormState>(); //drzi login key
-
-  final TextEditingController _usernameController = TextEditingController(); //uzimaju user i pass iz tekstnih polja
-  final TextEditingController _passwordController = TextEditingController();
+  final _loginKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   @override
-  void dispose() { //mice widgete
+  void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _handleLogin() async {
-    if (_loginKey.currentState!.validate()) { //ako ima login key -> poziva login funkciju iz auth.dart
-      AuthService authService = AuthService();
-
-      final user = await authService.login(
+    if (_loginKey.currentState!.validate()) {
+      final user = await AuthService().login(
         _usernameController.text,
         _passwordController.text,
         context,
       );
-
-      if (user != null) { //ako je login uspjesan -> prebaci na home page
+      if (user != null) {
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => MyHomePage(user: user)),
+          MaterialPageRoute(builder: (_) => MyHomePage(user: user)),
               (route) => false,
         );
       }
-    } else { //ako je neuspjesan -> ispisi u snackbaru
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
@@ -47,8 +46,9 @@ class _MyLoginPageState extends State<MyLoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) { //dizajn widgeta
+  Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: const Text('FindMyFood')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -57,38 +57,46 @@ class _MyLoginPageState extends State<MyLoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Username
                 TextFormField(
                   controller: _usernameController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Username",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a valid username';
-                    }
-                    return null;
-                  },
+                  decoration: const InputDecoration(labelText: 'Username'),
+                  validator: (v) =>
+                  v == null || v.isEmpty ? 'Enter username' : null,
                 ),
+
                 const SizedBox(height: 20),
+
+                // Password
                 TextFormField(
                   controller: _passwordController,
+                  decoration: const InputDecoration(labelText: 'Password'),
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: "Password",
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a valid password';
-                    }
-                    return null;
-                  },
+                  validator: (v) =>
+                  v == null || v.isEmpty ? 'Enter password' : null,
                 ),
+
                 const SizedBox(height: 20),
+
+                // Login button
                 ElevatedButton(
                   onPressed: _handleLogin,
                   child: const Text('Login'),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Register button, same style
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const RegisterScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Register'),
                 ),
               ],
             ),
