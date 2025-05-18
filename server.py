@@ -173,10 +173,12 @@ def refresh():
         return jsonify({"message": "Refresh token is required"}), 401
 
     try:
+        # print(f"Received refresh token: {refresh_token}")  # Debugging line
         payload = jwt.decode(
             refresh_token, app.config["REFRESH_SECRET_KEY"], algorithms=["HS256"]
         )
         user_id = payload["user_id"]
+        # print(f"Decoded user ID: {user_id}")  # Debugging line
         # Dohvacanje korisnika iz baze podataka na temelju ID-a.
         current_user = User.query.get(user_id)
         # Provjera postoji li korisnik s tim ID.
@@ -187,9 +189,7 @@ def refresh():
         refresh_db_token = RefreshToken.query.filter_by(
             token=refresh_token, user_id=user_id
         ).first()
-        if not refresh_db_token or refresh_db_token.expiry_date < datetime.datetime.now(
-            datetime.timezone.utc
-        ):
+        if not refresh_db_token or refresh_db_token.expiry_date < datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None):
             # Ako refresh token ne postoji ili je istekao, brise se iz baze podataka ako postoji.
             if refresh_db_token:
                 db.session.delete(refresh_db_token)
@@ -206,6 +206,7 @@ def refresh():
         ), 200
     # Hvatanje iznimke ako je potpis refresh tokena istekao.
     except jwt.ExpiredSignatureError:
+        # print(f"Expired refresh token: {refresh_token}")  # Debugging line
         # Ako je refresh token istekao, brise se iz baze podataka ako postoji.
         refresh_db_token = RefreshToken.query.filter_by(token=refresh_token).first()
         if refresh_db_token:
@@ -213,7 +214,8 @@ def refresh():
             db.session.commit()
         return jsonify({"message": "Refresh token expired!"}), 401
     # Hvatanje ostalih iznimki vezanih uz nevazeci refresh token.
-    except (jwt.InvalidTokenError, Exception):
+    except jwt.InvalidTokenError as e:
+        # print(f"Invalid token error: {str(e)}")
         return jsonify({"message": "Invalid refresh token!"}), 401
 
 
