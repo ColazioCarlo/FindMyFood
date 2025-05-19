@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:find_my_food/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+
+import 'login/login.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -35,19 +38,21 @@ class AuthService {
 
       if (loginResponse.statusCode == 200) { //provjerava ako je login ok i daje token
         final loginData = jsonDecode(loginResponse.body);
-        final token = loginData['token'];
+        final access_token = loginData['access_token'];
+        final refresh_token = loginData['refresh_token'];
+        print(access_token);
+        print(refresh_token);
 
 
         final protectedResponse = await client.get( //get request za username
           protectedUrl,
           headers: {'Content-Type': 'application/json',
-            'token': token,
+            "Authorization": "Bearer $access_token"   //bearer token
           },
 
         );
 
         String protectedMessage = "Access failed";
-
 
         if (protectedResponse.statusCode == 200) { //ako je response ok -> izvadi username iz messagea
           final responseJson = jsonDecode(protectedResponse.body);
@@ -55,7 +60,7 @@ class AuthService {
           final username = msg.split(' ').last;
 
           _username = username;
-          protectedMessage = "Logged in as $username";
+          protectedMessage = msg;
         }
 
 
@@ -77,5 +82,57 @@ class AuthService {
       );
     }
     return null;
+  }
+
+  Future<void> register(
+      String username,
+      String password,
+      BuildContext context,
+      ) async { //omogucuje asinkrono programiranje
+    final registerUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/register');
+
+    final body = {
+      'username': username,
+      'password': password,
+    };
+
+    try {
+      final registerResponse = await client.post( //salje user i pass za registriranje
+        registerUrl,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (registerResponse.statusCode == 201) { //provjerava ako je register ok
+        final responseJson = jsonDecode(registerResponse.body);
+
+
+        ScaffoldMessenger.of(context).showSnackBar( //prikaze poruku od registracije
+          SnackBar(content: Text(responseJson['message'])),
+
+
+        );
+
+        Navigator.push(   //ako je registracija uspjesna ide nazad na login screen
+          context,
+          MaterialPageRoute(
+            builder: (_) => const  MyLoginPage(),
+          ),
+        );
+
+      } else {
+        print("Register failed: ${registerResponse.statusCode}");
+        final responseJson = jsonDecode(registerResponse.body);
+        String error = responseJson['message'];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error)),
+        );
+      }
+    } catch (e) {
+      print("Login error: $e");
+      ScaffoldMessenger.of(context).showSnackBar( //prikaze error ako ga ima
+        SnackBar(content: Text("Error: $e")),
+      );
+    }
   }
 }
