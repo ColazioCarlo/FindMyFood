@@ -60,7 +60,7 @@ jobs:
           echo "Accessing /refresh endpoint..."
           REFRESH_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
             -H "Content-Type: application/json" \
-            -d "{\"refresh_token\": \"$REFRESH_TOKEN\"}"
+            -d "{\"refresh_token\": \"$REFRESH_TOKEN\"}" \
             "$BASE_URL/refresh")
 
           if [ "$REFRESH_STATUS" != "200" ]; then
