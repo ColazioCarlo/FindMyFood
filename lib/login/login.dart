@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:find_my_food/auth.dart';
 import 'package:find_my_food/home.dart';
-import 'package:find_my_food/login/register.dart';  // ← re‑add
+import 'package:find_my_food/login/register.dart';
 
 class MyLoginPage extends StatefulWidget {
   const MyLoginPage({super.key});
