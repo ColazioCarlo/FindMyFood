@@ -1,21 +1,20 @@
-// lib/login/login.dart
-
 import 'package:flutter/material.dart';
-import 'package:find_my_food/auth.dart';
-import 'package:find_my_food/home.dart';
-import 'package:find_my_food/login/register.dart';  // ← re‑add
+import 'package:flutter/gestures.dart';
 
-class MyLoginPage extends StatefulWidget {
-  const MyLoginPage({super.key});
+import '../auth.dart';
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<MyLoginPage> createState() => _MyLoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _MyLoginPageState extends State<MyLoginPage> {
-  final _loginKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _passwordVisible = false;
 
   @override
   void dispose() {
@@ -25,18 +24,15 @@ class _MyLoginPageState extends State<MyLoginPage> {
   }
 
   Future<void> _handleLogin() async {
-    if (_loginKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       final user = await AuthService().login(
         _usernameController.text,
         _passwordController.text,
         context,
       );
       if (user != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (_) => MyHomePage(user: user)),
-              (route) => false,
-        );
+        Navigator.pushNamed(context, '/home');
+
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,60 +44,123 @@ class _MyLoginPageState extends State<MyLoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('FindMyFood')),
-      body: Center(
+      backgroundColor: const Color(0xFFC4EED7),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Form(
-            key: _loginKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Username
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(labelText: 'Username'),
-                  validator: (v) =>
-                  v == null || v.isEmpty ? 'Enter username' : null,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 40),
+              Image.asset('assets/images/logo.png', height: 150),
+              const SizedBox(height: 40),
+              const Text(
+                'Welcome back!',
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF235216),
                 ),
-
-                const SizedBox(height: 20),
-
-                // Password
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(labelText: 'Password'),
-                  obscureText: true,
-                  validator: (v) =>
-                  v == null || v.isEmpty ? 'Enter password' : null,
-                ),
-
-                const SizedBox(height: 20),
-
-                // Login button
-                ElevatedButton(
-                  onPressed: _handleLogin,
-                  child: const Text('Login'),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Register button, same style
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const RegisterScreen(),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 30),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    _buildTextField(_usernameController, 'Username'),
+                    _buildPasswordField(),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF00813E),
+                        elevation: 10,
+                        minimumSize: Size(MediaQuery.of(context).size.width * 0.7, 50),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                    );
-                  },
-                  child: const Text('Register'),
+                      child: const Text(
+                        'Log in',
+                        style: TextStyle(color: Colors.white, fontSize: 25),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 20),
+              RichText(
+                text: TextSpan(
+                  text: "I don't have an account... ",
+                  style: const TextStyle(color: Colors.black),
+                  children: [
+                    TextSpan(
+                      text: 'Go back',
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        decoration: TextDecoration.underline,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.pushNamed(context, '/register');
+                        },
+                    )
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(TextEditingController controller, String label,
+      {int? maxLength, TextInputType keyboardType = TextInputType.text}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLength: maxLength,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        validator: (value) => value == null || value.isEmpty ? 'Enter $label' : null,
+      ),
+    );
+  }
+
+  Widget _buildPasswordField() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: TextFormField(
+        controller: _passwordController,
+        obscureText: !_passwordVisible,
+        decoration: InputDecoration(
+          labelText: 'Password',
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          suffixIcon: IconButton(
+            icon: Icon(
+              _passwordVisible ? Icons.visibility : Icons.visibility_off,
+              color: Colors.black,
+            ),
+            onPressed: () => setState(() => _passwordVisible = !_passwordVisible),
+          ),
+        ),
+        validator: (value) => value == null || value.isEmpty ? 'Enter password' : null,
       ),
     );
   }

@@ -1,8 +1,11 @@
 // lib/main.dart
 
+import 'package:find_my_food/pocetna.dart';
 import 'package:flutter/material.dart';
-import 'package:find_my_food/login/login.dart';
 import 'package:find_my_food/login/register.dart';
+
+import 'home.dart';
+import 'login/login.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,9 +44,11 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MyLoginPage(),
+      home: const MyFirstPage(),
       routes: {
+        '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
+        '/home': (_) => const MyHomePage(),
       },
     );
   }
