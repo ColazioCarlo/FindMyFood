@@ -17,6 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -31,6 +32,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
@@ -60,6 +62,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     await AuthService().registerposlovni(
       _usernameController.text,
       _passwordController.text,
+      _nameController.text,
       _emailController.text,
       _phoneController.text,
       _addressController.text,
@@ -119,6 +122,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     _buildTextField(_usernameController, 'Username'),
                     _buildPasswordField(),
                     if (_isPlace) ...[
+                      _buildTextField(_nameController, 'Name'),
                       _buildTextField(_emailController, 'E-mail'),
                       _buildTextField(_phoneController, 'Phone number', maxLength: 9),
                       _buildTextField(_addressController, 'Address'),
