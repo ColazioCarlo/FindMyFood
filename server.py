@@ -4,6 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from functools import wraps
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -13,6 +15,8 @@ app.config['SECRET_KEY'] = 'aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlX
 # Updateat URI po vlastitim MySQL credentialsima i imenom baze podataka
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://FindMyFood:findmyfood@localhost/FindMyFood'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+GOOGLE_MAPS_API_KEY = "AIzaSyBaP9v66ys9ZFzUcf1rYkopaOKmDKapkNU"
 
 # Inicijalizacija baze podataka
 db = SQLAlchemy(app)
@@ -99,6 +103,45 @@ def login():
 @token_required
 def protected(current_user):
     return jsonify({'message': f'Hello world {current_user}'})
+
+@token_required
+@app.route('/getplaces', methods=['POST'])
+def nearby_places():
+    data = request.get_json()
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+    radius = data.get("radius", 1000)  # Default radius is 1000 meters
+    place_type = data.get("type", "restaurant")  # Default search type is restaurant
+
+    if not latitude or not longitude:
+        return jsonify({"message": "Latitude and longitude are required"}), 400
+
+    print(f"Latitude: {latitude}, Longitude: {longitude}")
+
+    url = "https://places.googleapis.com/v1/places:searchNearby"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+        "X-Goog-FieldMask": "places.id,places.displayName,places.location"
+    }
+    payload = {
+        "includedTypes": [place_type],
+        "maxResultCount": 10,
+        "locationRestriction": {
+            "circle": {
+                "center": {"latitude": latitude, "longitude": longitude},
+                "radius": radius
+            }
+        }
+    }
+
+    print(f"Poziv na google API:")
+
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+
+    print(f"{response}")
+
+    return jsonify(response.json())
 
 if __name__ == '__main__':
     with app.app_context():
