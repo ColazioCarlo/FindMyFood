@@ -5,6 +5,8 @@ import jwt
 import datetime
 from functools import wraps
 import os
+import requests
+import json
 
 app = Flask(__name__)
 
@@ -25,6 +27,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ACCESS_TOKEN_LIFETIME = datetime.timedelta(minutes=30)
 REFRESH_TOKEN_LIFETIME = datetime.timedelta(days=7)
 
+GOOGLE_MAPS_API_KEY = "AIzaSyBaP9v66ys9ZFzUcf1rYkopaOKmDKapkNU"
+
 # Inicijalizacija SQLAlchemy instance za rad s bazom podataka.
 db = SQLAlchemy(app)
 
@@ -39,6 +43,22 @@ class User(db.Model):
 
     def __repr__(self):
         return f"<User {self.username}>"
+
+class BusinessUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    phone = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.String(255), nullable=False)
+    parkingtotal = db.Column(db.Integer, nullable=True)
+    parkingfree = db.Column(db.Integer, nullable=True)
+    opis = db.Column(db.Text, nullable=True)
+    google_place_id = db.Column(db.String(50), unique=True, nullable=True)
+
+    def __repr__(self):
+        return f"<PoslovniUser {self.username}>"
 
 
 # Definiran RefreshToken model za pohranu refresh tokena u bazi podataka.
@@ -218,6 +238,67 @@ def refresh():
         # print(f"Invalid token error: {str(e)}")
         return jsonify({"message": "Invalid refresh token!"}), 401
 
+# Query Google Places API to get the Place ID for the given address
+def get_place_id(address):
+    url = "https://places.googleapis.com/v1/places:searchText"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+        "X-Goog-FieldMask": "places.id"
+    }
+    payload = {
+        "textQuery": address
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+    data = response.json()
+
+    if response.status_code == 200 and "places" in data and data["places"]:
+        return data["places"][0]["id"]
+    return None
+
+
+@app.route("/registerposlovni", methods=["POST"])
+def register_poslovni():
+    data = request.get_json()
+
+    # Validate input data
+    required_fields = ["username", "password", "name", "email", "phone", "address", "parking", "opis"]
+    if not all(field in data for field in required_fields):
+        return jsonify({"message": "All fields are required"}), 400
+
+    # Check if username or email already exists
+    if BusinessUser.query.filter_by(username=data["username"]).first() or BusinessUser.query.filter_by(email=data["email"]).first():
+        return jsonify({"message": "Username or email already exists"}), 409
+
+    # Hash password
+    hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
+
+    # Fetch Place ID from Google Places API
+    # Ukoliko nije moguce pronaci mjesto na mapi, funkcija vraca null. Zasad dozvoljavamo i mjesta koja nisu dostupna na mapsu, ali to se moze zabraniti provjerom:
+    google_place_id = get_place_id(data["address"])
+
+    # if not google_place_id:
+        # return jsonify({"message": "Could not find a valid Google Maps place ID for this address"}), 400
+
+    # Create a new business user
+    new_business = BusinessUser(
+        username=data["username"],
+        password=hashed_password,
+        name=data["name"],
+        email=data["email"],
+        phone=data["phone"],
+        address=data["address"],
+        parkingtotal=int(data["parking"]),
+        parkingfree=int(data["parking"]),
+        opis=data["opis"],
+        google_place_id=google_place_id
+    )
+
+    db.session.add(new_business)
+    db.session.commit()
+
+    return jsonify({"message": "User registered successfully"}), 201
 
 # Logged in ruta s tokenom, vraca osnovni hello world
 @app.route("/protected", methods=["GET"])
