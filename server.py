@@ -30,6 +30,22 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.username}>'
 
+class BusinessUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    name = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+    phone = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.String(255), nullable=False)
+    parkingtotal = db.Column(db.Integer, nullable=True)
+    parkingfree = db.Column(db.Integer, nullable=True)
+    opis = db.Column(db.Text, nullable=True)
+    google_place_id = db.Column(db.String(50), unique=True, nullable=True)
+
+    def __repr__(self):
+        return f"<PoslovniUser {self.username}>"
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -116,13 +132,13 @@ def nearby_places():
     if not latitude or not longitude:
         return jsonify({"message": "Latitude and longitude are required"}), 400
 
-    print(f"Latitude: {latitude}, Longitude: {longitude}")
+    # print(f"Latitude: {latitude}, Longitude: {longitude}")
 
     url = "https://places.googleapis.com/v1/places:searchNearby"
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-        "X-Goog-FieldMask": "places.id,places.displayName,places.location"
+        "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.rating"
     }
     payload = {
         "includedTypes": [place_type],
@@ -135,13 +151,35 @@ def nearby_places():
         }
     }
 
-    print(f"Poziv na google API:")
+    # print(f"Poziv na google API:")
 
     response = requests.post(url, headers=headers, data=json.dumps(payload))
 
-    print(f"{response}")
+    # print(f"{response}")
 
-    return jsonify(response.json())
+    data = response.json()
+
+    if response.status_code != 200 or "places" not in data:
+        return jsonify({"message": "Failed to fetch places from Google Places API"}), 500
+
+    matched_places = []
+
+    for place in data["places"]:
+        google_place_id = place.get("id")
+        business = BusinessUser.query.filter_by(google_place_id=google_place_id).first()
+
+        if business:
+            matched_places.append({
+                "name": business.name,
+                "email": business.email,
+                "phone": business.phone,
+                "address": business.address,
+                "parking_total": business.parking,
+                "opis": business.opis,
+                "rating": place.get("rating")
+            })
+
+    return jsonify(matched_places)
 
 if __name__ == '__main__':
     with app.app_context():
