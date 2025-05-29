@@ -8,3 +8,4 @@ class Config:
     SQLALCHEMY_DATABASE_URI = "mysql+pymysql://FindMyFood:findmyfood@localhost/FindMyFood"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     REFRESH_SECRET_KEY = os.getenv('REFRESH_SECRET_KEY') 
+    MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
