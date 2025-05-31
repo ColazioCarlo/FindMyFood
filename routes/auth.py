@@ -2,7 +2,6 @@ from flask import Blueprint, request, jsonify, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import jwt
-from get_places import get_place_id
 from extensions import db
 from models.user import User
 from models.BusinessUser import BusinessUser
@@ -10,6 +9,24 @@ from models.refresh_token import RefreshToken
 from utils.auth_utils import generate_access_token, generate_refresh_token
 
 auth_bp = Blueprint("auth", __name__)
+
+
+# Query Google Places API to get the Place ID for the given address
+def get_place_id(address):
+    url = "https://places.googleapis.com/v1/places:searchText"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+        "X-Goog-FieldMask": "places.id",
+    }
+    payload = {"textQuery": address}
+
+    response = requests.post(url, headers=headers, json=payload)
+    data = response.json()
+
+    if response.status_code == 200 and "places" in data and data["places"]:
+        return data["places"][0]["id"]
+    return None
 
 
 @auth_bp.route("/register", methods=["POST"])
