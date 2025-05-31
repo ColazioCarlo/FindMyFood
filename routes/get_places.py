@@ -11,24 +11,6 @@ GOOGLE_MAPS_API_KEY = Config.MAPS_API_KEY  # da se kolegi ne nabije racun :D
 getplaces_bp = Blueprint("getplaces", __name__)
 
 
-# Query Google Places API to get the Place ID for the given address
-def get_place_id(address):
-    url = "https://places.googleapis.com/v1/places:searchText"
-    headers = {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-        "X-Goog-FieldMask": "places.id",
-    }
-    payload = {"textQuery": address}
-
-    response = requests.post(url, headers=headers, json=payload)
-    data = response.json()
-
-    if response.status_code == 200 and "places" in data and data["places"]:
-        return data["places"][0]["id"]
-    return None
-
-
 @getplaces_bp.route("/getplaces", methods=["GET"])
 @token_required
 def nearby_places(*args, **kwargs):
