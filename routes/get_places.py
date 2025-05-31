@@ -6,9 +6,28 @@ from config import Config
 from models.user import User
 from models.BusinessUser import BusinessUser
 
-GOOGLE_MAPS_API_KEY = Config.MAPS_API_KEY # da se kolegi ne nabije racun :D
+GOOGLE_MAPS_API_KEY = Config.MAPS_API_KEY  # da se kolegi ne nabije racun :D
 
-getplaces_bp = Blueprint('getplaces', __name__)
+getplaces_bp = Blueprint("getplaces", __name__)
+
+
+# Query Google Places API to get the Place ID for the given address
+def get_place_id(address):
+    url = "https://places.googleapis.com/v1/places:searchText"
+    headers = {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+        "X-Goog-FieldMask": "places.id",
+    }
+    payload = {"textQuery": address}
+
+    response = requests.post(url, headers=headers, json=payload)
+    data = response.json()
+
+    if response.status_code == 200 and "places" in data and data["places"]:
+        return data["places"][0]["id"]
+    return None
+
 
 @getplaces_bp.route("/getplaces", methods=["GET"])
 @token_required
@@ -28,7 +47,7 @@ def nearby_places(*args, **kwargs):
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-        "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.rating"
+        "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.rating",
     }
     payload = {
         "includedTypes": [place_type],
@@ -36,9 +55,9 @@ def nearby_places(*args, **kwargs):
         "locationRestriction": {
             "circle": {
                 "center": {"latitude": latitude, "longitude": longitude},
-                "radius": radius
+                "radius": radius,
             }
-        }
+        },
     }
 
     print(f"Poziv na google API:")
@@ -49,7 +68,7 @@ def nearby_places(*args, **kwargs):
 
     data = response.json()
     print(data)
-    #if response.status_code != 200 or "places" not in data:
+    # if response.status_code != 200 or "places" not in data:
     #    return jsonify({"message": "Failed to fetch places from Google Places API"}), 500
 
     matched_places = []
@@ -59,14 +78,16 @@ def nearby_places(*args, **kwargs):
         business = BusinessUser.query.filter_by(google_place_id=google_place_id).first()
 
         if business:
-            matched_places.append({
-                "name": business.name,
-                "email": business.email,
-                "phone": business.phone,
-                "address": business.address,
-                "parking_total": business.parking,
-                "opis": business.opis,
-                "rating": place.get("rating")
-            })
+            matched_places.append(
+                {
+                    "name": business.name,
+                    "email": business.email,
+                    "phone": business.phone,
+                    "address": business.address,
+                    "parking_total": business.parking,
+                    "opis": business.opis,
+                    "rating": place.get("rating"),
+                }
+            )
 
     return jsonify(matched_places)
