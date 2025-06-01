@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'reservation.dart';
-
+import 'profile.dart'; // import your profile screen
 
 class RestaurantItem extends StatelessWidget {
   final String title;
@@ -46,7 +46,6 @@ class RestaurantItem extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-
                     Row(
                       children: [
                         const Text(
@@ -70,24 +69,16 @@ class RestaurantItem extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-
                     const Text(
                       'Tables available: 5',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 8),
-
                     const Text(
                       'Parking spots left: 10',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(fontSize: 16),
                     ),
-
                     const Spacer(),
-
                     Align(
                       alignment: Alignment.bottomRight,
                       child: ElevatedButton(
@@ -95,9 +86,8 @@ class RestaurantItem extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ReservationPage(
-                                restaurantName: title,
-                              ),
+                              builder: (context) =>
+                                  ReservationPage(restaurantName: title),
                             ),
                           );
                         },
@@ -126,7 +116,6 @@ class RestaurantItem extends StatelessWidget {
                 ),
               ),
             ),
-
             Expanded(
               flex: 1,
               child: ClipRRect(
@@ -147,7 +136,6 @@ class RestaurantItem extends StatelessWidget {
     );
   }
 }
-
 
 class RestaurantListPage extends StatelessWidget {
   const RestaurantListPage({super.key});
@@ -172,20 +160,21 @@ class RestaurantListPage extends StatelessWidget {
           return RestaurantItem(title: title);
         },
       ),
-
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
-        selectedItemColor: Colors.white,
+        selectedItemColor: Colors.white, // “List” is white on this screen
         unselectedItemColor: Colors.black,
-        currentIndex: 1, // “List” is index 1
+        currentIndex: 1, // index 1 = “List”
         onTap: (index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            // Already on “List” → do nothing
+            // already on “List”
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/profile');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            );
           }
         },
         items: const [

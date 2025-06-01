@@ -1,7 +1,7 @@
 // lib/reservation.dart
 
 import 'package:flutter/material.dart';
-
+import 'profile.dart'; // import your profile screen
 
 class ReservationPage extends StatefulWidget {
   final String restaurantName;
@@ -19,7 +19,6 @@ class _ReservationPageState extends State<ReservationPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
 
-
   String get _dateText {
     if (_selectedDate == null) return 'DD/MM/YYYY';
     final d = _selectedDate!;
@@ -28,6 +27,7 @@ class _ReservationPageState extends State<ReservationPage> {
     final year = d.year.toString();
     return '$day/$month/$year';
   }
+
   String get _timeText {
     if (_selectedTime == null) return '00:00';
     final t = _selectedTime!;
@@ -41,7 +41,7 @@ class _ReservationPageState extends State<ReservationPage> {
     final picked = await showDatePicker(
       context: context,
       initialDate: now,
-      firstDate: now, // no past dates
+      firstDate: now,
       lastDate: DateTime(now.year + 2),
     );
     if (picked != null) {
@@ -80,10 +80,7 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Text.rich(
@@ -125,10 +122,7 @@ class _ReservationPageState extends State<ReservationPage> {
                 textAlign: TextAlign.left,
               ),
             ),
-
             const SizedBox(height: 24),
-
-
             GestureDetector(
               onTap: _pickDate,
               child: Container(
@@ -162,10 +156,7 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-
             GestureDetector(
               onTap: _pickTime,
               child: Container(
@@ -199,22 +190,35 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
-
             SizedBox(
               width: 290,
               height: 74,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: spoji datum i vrijeme s backendom
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Reserved at ${widget.restaurantName} on $_dateText at $_timeText',
+                  if (_selectedDate == null || _selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Please choose both date and time.'),
                       ),
-                    ),
+                    );
+                    return;
+                  }
+                  final hour = _selectedTime!.hour.toString().padLeft(2, '0');
+                  final minute =
+                  _selectedTime!.minute.toString().padLeft(2, '0');
+                  final time24 = '$hour:$minute';
+
+                  Navigator.pushNamed(
+                    context,
+                    '/use_benefits',
+                    arguments: {
+                      'restaurantName': widget.restaurantName,
+                      'reservationDate': _selectedDate!.toIso8601String(),
+                      'reservationTime': time24,
+                      'fidelityPoints': 150,   // TODO
+                      'voucherCode': '5GH79Y', // TODO
+                    },
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -225,7 +229,6 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
                 child: const Text(
                   'Reserve!',
-                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -236,9 +239,7 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ),
             ),
-
             const SizedBox(height: 32),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -253,9 +254,7 @@ class _ReservationPageState extends State<ReservationPage> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF63917C),
                     shape: RoundedRectangleBorder(
@@ -268,7 +267,6 @@ class _ReservationPageState extends State<ReservationPage> {
                   ),
                   child: const Text(
                     'Go back',
-                    textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -290,26 +288,25 @@ class _ReservationPageState extends State<ReservationPage> {
                 ),
               ],
             ),
-
             const SizedBox(height: 24),
           ],
         ),
       ),
-
-
-
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
-        selectedItemColor: Colors.white,
+        selectedItemColor: Colors.black,
         unselectedItemColor: Colors.black,
-        currentIndex: 1, // “List” is index 1
+        currentIndex: 1, // Highlight “List” in black when on Reservation
         onTap: (index) {
           if (index == 0) {
             Navigator.pushNamed(context, '/home');
           } else if (index == 1) {
-            // Already on “List” → do nothing
+            Navigator.pushNamed(context, '/list');
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/profile');
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            );
           }
         },
         items: const [
