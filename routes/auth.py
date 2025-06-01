@@ -13,8 +13,8 @@ from config import Config
 auth_bp = Blueprint("auth", __name__)
 
 
-# Query Google Places API to get the Place ID for the given address
-def get_place_id(address):
+# Query Google Places API to get the Place ID for the given text query
+def get_place_id(text):
     GOOGLE_MAPS_API_KEY = Config.MAPS_API_KEY
     url = "https://places.googleapis.com/v1/places:searchText"
     headers = {
@@ -22,7 +22,7 @@ def get_place_id(address):
         "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
         "X-Goog-FieldMask": "places.id",
     }
-    payload = {"textQuery": address}
+    payload = {"textQuery": text}
 
     response = requests.post(url, headers=headers, json=payload)
     data = response.json()
@@ -87,7 +87,7 @@ def register_poslovni():
 
     # Fetch Place ID from Google Places API
     # Ukoliko nije moguce pronaci mjesto na mapi, funkcija vraca null. Zasad dozvoljavamo i mjesta koja nisu dostupna na mapsu, ali to se moze zabraniti provjerom:
-    google_place_id = get_place_id(data["address"])
+    google_place_id = get_place_id(data["name"]+data["address"])
 
     # if not google_place_id:
     # return jsonify({"message": "Could not find a valid Google Maps place ID for this address"}), 400
