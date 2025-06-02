@@ -1,5 +1,3 @@
-// lib/main.dart
-
 import 'package:flutter/material.dart';
 
 // Existing imports:
@@ -7,11 +5,20 @@ import 'package:find_my_food/login/register.dart';
 import 'home.dart';
 import 'login/login.dart';
 
-// NEW imports for your new screens:
+// NEW imports for your existing screens:
 import 'restaurant_list.dart';
 import 'reservation.dart';
 import 'use_benefits_before_paying.dart';
 import 'pay.dart';
+
+// Import your Edit Owner Profile page:
+import 'edit_owner_profile.dart';
+
+// Import the new Current Conditions page:
+import 'current_conditions.dart';
+
+// Import the new Edit Benefits page:
+import 'edit_benefits.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,6 +30,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const appTitle = 'FindMyFood';
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: appTitle,
@@ -50,10 +58,11 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // Start on the “list” page by default:
-      initialRoute: '/list',
+      // Launch straight into the Edit Owner Profile page:
+      home: const EditOwnerProfilePage(),
 
-      // Named route definitions:
+      // ───────────────────────────────────────────────────────────────────
+      // ROUTES MAP
       routes: {
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
@@ -62,8 +71,8 @@ class MyApp extends StatelessWidget {
 
         // “Reservation” route only needs restaurantName:
         '/reservation': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments
-          as Map<String, dynamic>;
+          final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ReservationPage(
             restaurantName: args['restaurantName'] as String,
           );
@@ -71,37 +80,47 @@ class MyApp extends StatelessWidget {
 
         // “Use Benefits” route needs all five parameters:
         '/use_benefits': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments
-          as Map<String, dynamic>;
+          final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return UseBenefitsPage(
             restaurantName: args['restaurantName'] as String,
             reservationDate:
             DateTime.parse(args['reservationDate'] as String),
             reservationTime:
-            _stringToTimeOfDay(args['reservationTime'] as String),
+            stringToTimeOfDay(args['reservationTime'] as String),
             fidelityPoints: args['fidelityPoints'] as int,
             voucherCode: args['voucherCode'] as String,
           );
         },
 
-        // “Pay” route (uses placeholder camera view for now)
+        // “Pay” route (uses placeholder camera view for now):
         '/pay': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments
-          as Map<String, dynamic>;
+          final args =
+          ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return PayPage(
             originalSum: args['originalSum'] as int,
             discountedSum: args['discountedSum'] as int,
           );
         },
+
+        // NEW: Route for “Current Conditions” screen
+        '/current_conditions': (context) => const CurrentConditionsPage(),
+
+        // NEW: Route for “Profile” screen (i.e. Edit Owner Profile)
+        '/profile': (context) => const EditOwnerProfilePage(),
+
+        // NEW: Route for “Benefits” screen (EditBenefitsPage)
+        '/benefits': (context) => const EditBenefitsPage(),
       },
     );
   }
+}
 
-  /// Helper to convert an “HH:mm” string into a TimeOfDay.
-  static TimeOfDay _stringToTimeOfDay(String timeString) {
-    final parts = timeString.split(':');
-    final hour = int.parse(parts[0]);
-    final minute = int.parse(parts[1]);
-    return TimeOfDay(hour: hour, minute: minute);
-  }
+/// Top‐level helper to convert an “HH:mm” string into a TimeOfDay.
+/// Moving this out of MyApp so it’s in scope for the route closures.
+TimeOfDay stringToTimeOfDay(String timeString) {
+  final parts = timeString.split(':');
+  final hour = int.parse(parts[0]);
+  final minute = int.parse(parts[1]);
+  return TimeOfDay(hour: hour, minute: minute);
 }
