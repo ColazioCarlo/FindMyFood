@@ -1,5 +1,3 @@
-// lib/restaurant_list.dart
-
 import 'package:flutter/material.dart';
 import 'reservation.dart';
 import 'profile.dart'; // import your profile screen
@@ -167,10 +165,12 @@ class RestaurantListPage extends StatelessWidget {
         currentIndex: 1, // index 1 = “List”
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/home');
+            // Navigate to Map
+            Navigator.pushNamed(context, '/map');
           } else if (index == 1) {
-            // already on “List”
+            // Already on “List” → do nothing
           } else if (index == 2) {
+            // Navigate to Profile
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const ProfilePage()),

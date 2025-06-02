@@ -1,3 +1,5 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 
 // Existing imports:
@@ -5,20 +7,14 @@ import 'package:find_my_food/login/register.dart';
 import 'home.dart';
 import 'login/login.dart';
 
-// NEW imports for your existing screens:
+// NEW imports for your new screens:
 import 'restaurant_list.dart';
 import 'reservation.dart';
 import 'use_benefits_before_paying.dart';
 import 'pay.dart';
 
-// Import your Edit Owner Profile page:
-import 'edit_owner_profile.dart';
-
-// Import the new Current Conditions page:
-import 'current_conditions.dart';
-
-// Import the new Edit Benefits page:
-import 'edit_benefits.dart';
+// Import the new Map page:
+import 'map.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,7 +26,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const appTitle = 'FindMyFood';
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: appTitle,
@@ -58,12 +53,15 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // Launch straight into the Edit Owner Profile page:
-      home: const EditOwnerProfilePage(),
-
       // ───────────────────────────────────────────────────────────────────
-      // ROUTES MAP
+      // Start on the “Map” page by default:
+      initialRoute: '/map',
+
+      // Named route definitions:
       routes: {
+        // NEW: Route for “Map” screen
+        '/map': (context) => const MapPage(),
+
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
         '/home': (_) => const MyHomePage(),
@@ -87,7 +85,7 @@ class MyApp extends StatelessWidget {
             reservationDate:
             DateTime.parse(args['reservationDate'] as String),
             reservationTime:
-            stringToTimeOfDay(args['reservationTime'] as String),
+            _stringToTimeOfDay(args['reservationTime'] as String),
             fidelityPoints: args['fidelityPoints'] as int,
             voucherCode: args['voucherCode'] as String,
           );
@@ -102,25 +100,15 @@ class MyApp extends StatelessWidget {
             discountedSum: args['discountedSum'] as int,
           );
         },
-
-        // NEW: Route for “Current Conditions” screen
-        '/current_conditions': (context) => const CurrentConditionsPage(),
-
-        // NEW: Route for “Profile” screen (i.e. Edit Owner Profile)
-        '/profile': (context) => const EditOwnerProfilePage(),
-
-        // NEW: Route for “Benefits” screen (EditBenefitsPage)
-        '/benefits': (context) => const EditBenefitsPage(),
       },
     );
   }
-}
 
-/// Top‐level helper to convert an “HH:mm” string into a TimeOfDay.
-/// Moving this out of MyApp so it’s in scope for the route closures.
-TimeOfDay stringToTimeOfDay(String timeString) {
-  final parts = timeString.split(':');
-  final hour = int.parse(parts[0]);
-  final minute = int.parse(parts[1]);
-  return TimeOfDay(hour: hour, minute: minute);
+  /// Helper to convert an “HH:mm” string into a TimeOfDay.
+  static TimeOfDay _stringToTimeOfDay(String timeString) {
+    final parts = timeString.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return TimeOfDay(hour: hour, minute: minute);
+  }
 }

@@ -1,5 +1,3 @@
-// lib/profile.dart
-
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -228,11 +226,9 @@ class ProfilePage extends StatelessWidget {
                         child: ListView.separated(
                           shrinkWrap: true,
                           itemCount: _futureReservations.length,
-                          separatorBuilder: (_, __) =>
-                          const SizedBox(height: 8),
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
-                            final restaurantName =
-                            _futureReservations[index];
+                            final restaurantName = _futureReservations[index];
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -251,19 +247,19 @@ class ProfilePage extends StatelessWidget {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       // TODO: navigate to reservation details
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(SnackBar(
-                                        content:
-                                        Text('Selected $restaurantName'),
-                                      ));
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Selected $restaurantName'),
+                                        ),
+                                      );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF136E49),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 0),
+                                      padding:
+                                      const EdgeInsets.symmetric(vertical: 0),
                                     ),
                                     child: const Text(
                                       'SELECT',
@@ -317,8 +313,7 @@ class ProfilePage extends StatelessWidget {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _pastReservations.length,
-                          separatorBuilder: (_, __) =>
-                          const SizedBox(height: 8),
+                          separatorBuilder: (_, __) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final restaurantName = _pastReservations[index];
                             return Text(
@@ -507,11 +502,13 @@ class ProfilePage extends StatelessWidget {
         currentIndex: 2, // “Profile” is index 2
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/home');
+            // Navigate to Map page
+            Navigator.pushNamed(context, '/map');
           } else if (index == 1) {
+            // Navigate to Restaurant List
             Navigator.pushNamed(context, '/list');
           } else if (index == 2) {
-            // already on “Profile”
+            // Already on “Profile” → do nothing
           }
         },
         items: const [
