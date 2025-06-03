@@ -10,8 +10,7 @@ GOOGLE_MAPS_API_KEY = Config.MAPS_API_KEY  # da se kolegi ne nabije racun :D
 
 getplaces_bp = Blueprint("getplaces", __name__)
 
-
-@getplaces_bp.route("/getplaces", methods=["GET"])
+@getplaces_bp.route("/getplaces", methods=["POST"])
 @token_required
 def nearby_places(*args, **kwargs):
     data = request.get_json()
@@ -22,8 +21,8 @@ def nearby_places(*args, **kwargs):
 
     if not latitude or not longitude:
         return jsonify({"message": "Latitude and longitude are required"}), 400
-    print(f"Maps key: {GOOGLE_MAPS_API_KEY}")
-    print(f"Latitude: {latitude}, Longitude: {longitude}")
+
+    # print(f"Latitude: {latitude}, Longitude: {longitude}")
 
     url = "https://places.googleapis.com/v1/places:searchNearby"
     headers = {
@@ -42,16 +41,16 @@ def nearby_places(*args, **kwargs):
         },
     }
 
-    print(f"Poziv na google API:")
+    # print(f"Poziv na google API:")
 
     response = requests.post(url, headers=headers, data=json.dumps(payload))
 
-    print(f"{response}")
+    # print(f"{response}")
 
     data = response.json()
-    print(data)
-    # if response.status_code != 200 or "places" not in data:
-    #    return jsonify({"message": "Failed to fetch places from Google Places API"}), 500
+    # print(data)
+    if response.status_code != 200 or "places" not in data:
+        return jsonify({"message": "Failed to fetch places from Google Places API"}), 500
 
     matched_places = []
 
@@ -66,7 +65,8 @@ def nearby_places(*args, **kwargs):
                     "email": business.email,
                     "phone": business.phone,
                     "address": business.address,
-                    "parking_total": business.parking,
+                    "parking_total": business.parkingtotal,
+                    "parking_free": business.parkingfree,
                     "opis": business.opis,
                     "rating": place.get("rating"),
                 }
