@@ -7,7 +7,7 @@ from extensions import db
 from models.user import User
 from models.BusinessUser import BusinessUser
 from models.refresh_token import RefreshToken
-from utils.auth_utils import generate_access_token, generate_refresh_token
+from utils.auth_utils import generate_access_token, generate_refresh_token, token_required
 from config import Config
 
 auth_bp = Blueprint("auth", __name__)
@@ -85,10 +85,14 @@ def register_poslovni():
     # Hash password
     hashed_password = generate_password_hash(data["password"], method="pbkdf2:sha256")
 
-    # Fetch Place ID from Google Places API
-    # Ukoliko nije moguce pronaci mjesto na mapi, funkcija vraca null. Zasad dozvoljavamo i mjesta koja nisu dostupna na mapsu, ali to se moze zabraniti provjerom:
-    google_place_id = get_place_id(data["name"]+data["address"])
+    # Ako nije zadan place id, pronadji ga uz ime i adresu objekta
+    # Ukoliko nije moguce pronaci mjesto na mapi, funkcija vraca null
+    if "google_place_id" in data and data["google_place_id"]:
+        google_place_id = data["google_place_id"]
+    else:
+        google_place_id = get_place_id(data["name"]+data["address"])
 
+    # Zasad dozvoljavamo i mjesta koja nisu dostupna na mapsu, ali to se moze zabraniti provjerom:
     # if not google_place_id:
     # return jsonify({"message": "Could not find a valid Google Maps place ID for this address"}), 400
 
@@ -110,6 +114,44 @@ def register_poslovni():
     db.session.commit()
 
     return jsonify({"message": "User registered successfully"}), 201
+
+
+@auth_bp.route("/editposlovni", methods=["POST"])
+@token_required
+def editposlovni(current_user):
+    # Verify current_user is actually a BusinessUser
+    business_user = BusinessUser.query.filter_by(username=current_user.username).first()
+    
+    if not business_user:
+        return jsonify({"message": "Access denied: not a business user"}), 403
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data provided"}), 400
+
+    updatable_fields = [
+        "password", "name", "email", "phone", "address",
+        "parkingtotal", "parkingfree", "opis", "google_place_id"
+    ]
+
+    updated = False
+    for field in updatable_fields:
+        if field in data:
+            if field == "password":
+                setattr(business_user, field, generate_password_hash(data[field]))
+            else:
+                setattr(business_user, field, data[field])
+            updated = True
+
+    if not updated:
+        return jsonify({"message": "No valid fields to update"}), 400
+
+    try:
+        db.session.commit()
+        return jsonify({"message": "Business user updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": "Error updating business user", "error": str(e)}), 500
 
 
 # Vraca token response na rutu ako su credentialsi dobri
