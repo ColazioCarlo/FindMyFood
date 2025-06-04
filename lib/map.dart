@@ -1,5 +1,3 @@
-// lib/map.dart
-
 import 'package:flutter/material.dart';
 
 class MapPage extends StatelessWidget {
@@ -8,7 +6,6 @@ class MapPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Use a Stack so that we can place the map image behind and the button on top
       body: Stack(
         children: [
           // Full‐screen placeholder map image
@@ -18,18 +15,15 @@ class MapPage extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-
-          // “Find My Food!” button at bottom center
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
               child: SizedBox(
                 width: double.infinity,
-                height: 60, // a bit taller for better centering
+                height: 60,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Push to restaurant_list.dart (route '/list')
                     Navigator.pushNamed(context, '/list');
                   },
                   style: ElevatedButton.styleFrom(
@@ -37,7 +31,7 @@ class MapPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(26),
                     ),
-                    padding: EdgeInsets.zero, // ensures full-size coverage
+                    padding: EdgeInsets.zero,
                   ),
                   child: const Center(
                     child: Text(
@@ -58,12 +52,11 @@ class MapPage extends StatelessWidget {
         ],
       ),
 
-      // Bottom navigation bar shared across Reservation, List, Profile, and now Map
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
-        currentIndex: 0, // “Map” is index 0 when on MapPage
+        currentIndex: 0,
         onTap: (index) {
           if (index == 0) {
             // Already on Map → do nothing
@@ -72,7 +65,7 @@ class MapPage extends StatelessWidget {
             Navigator.pushNamed(context, '/list');
           } else if (index == 2) {
             // Go to Profile
-            Navigator.pushNamed(context, '/profile');
+            Navigator.pushNamed(context, '/userprofile');
           }
         },
         items: const [

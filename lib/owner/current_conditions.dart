@@ -58,11 +58,10 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
 
             const SizedBox(height: 32),
 
-            // ── Block #1: Current Parking Spots ──────────────────────────
+            // ── Current Parking Spots ──────────────────────────
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Label (wraps if needed)
                 Text(
                   'Current parking spots:',
                   style: const TextStyle(
@@ -74,7 +73,6 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
                 ),
                 const SizedBox(height: 8),
 
-                // Row with text field (flex:2) and manual button (flex:3)
                 Row(
                   children: [
                     Expanded(
@@ -141,11 +139,10 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
 
             const SizedBox(height: verticalBlockSpacing),
 
-            // ── Block #2: Current Tables Available ────────────────────────
+            // ── Current Tables Available ────────────────────────
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Label (wraps if needed)
                 Text(
                   'Current tables available:',
                   style: const TextStyle(
@@ -157,7 +154,6 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
                 ),
                 const SizedBox(height: 8),
 
-                // Row with text field (flex:2) and manual button (flex:3)
                 Row(
                   children: [
                     Expanded(
@@ -222,12 +218,11 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
               ],
             ),
 
-            // Add more field blocks below if needed…
+            // ovdje dodaj buduce blokove
           ],
         ),
       ),
 
-      // ── Bottom Navigation Bar ───────────────────────────────────────
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
         selectedItemColor: Colors.white,
@@ -235,11 +230,11 @@ class _CurrentConditionsPageState extends State<CurrentConditionsPage> {
         currentIndex: 1, // “Current” is index 1
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/benefits');
+            Navigator.pushNamed(context, '/currbenefits');
           } else if (index == 1) {
             // Already here → do nothing
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/profile');
+            Navigator.pushNamed(context, '/ownprofile');
           }
         },
         items: const [

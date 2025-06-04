@@ -1,5 +1,3 @@
-// lib/use_benefits_before_paying.dart
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
 

@@ -1,19 +1,15 @@
-// lib/main.dart
-
+import 'package:find_my_food/pocetna.dart';
+import 'package:find_my_food/user/profile.dart';
 import 'package:flutter/material.dart';
-
-// Existing imports:
 import 'package:find_my_food/login/register.dart';
-import 'home.dart';
 import 'login/login.dart';
-
-// NEW imports for your new screens:
-import 'restaurant_list.dart';
-import 'reservation.dart';
-import 'use_benefits_before_paying.dart';
-import 'pay.dart';
-
-// Import the new Map page:
+import 'owner/current_conditions.dart';
+import 'owner/edit_benefits.dart';
+import 'owner/edit_owner_profile.dart';
+import 'user/restaurant_list.dart';
+import 'user/reservation.dart';
+import 'user/use_benefits_before_paying.dart';
+import 'user/pay.dart';
 import 'map.dart';
 
 void main() {
@@ -28,6 +24,7 @@ class MyApp extends StatelessWidget {
     const appTitle = 'FindMyFood';
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/pocetna',
       title: appTitle,
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -53,19 +50,17 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // ───────────────────────────────────────────────────────────────────
-      // Start on the “Map” page by default:
-      initialRoute: '/map',
 
-      // Named route definitions:
       routes: {
-        // NEW: Route for “Map” screen
         '/map': (context) => const MapPage(),
-
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
-        '/home': (_) => const MyHomePage(),
         '/list': (_) => const RestaurantListPage(),
+        '/pocetna': (_) => const MyFirstPage(),
+        '/currconditions': (_) => const CurrentConditionsPage(),
+        '/currbenefits': (_) => const EditBenefitsPage(),
+        '/ownprofile': (_) => const EditOwnerProfilePage(),
+        '/userprofile': (_) => const ProfilePage(),
 
         // “Reservation” route only needs restaurantName:
         '/reservation': (context) {

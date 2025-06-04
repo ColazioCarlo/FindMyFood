@@ -1,5 +1,3 @@
-// lib/pay.dart
-
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -20,8 +18,6 @@ class PayPage extends StatefulWidget {
 class _PayPageState extends State<PayPage> {
   /// Controller for the mobile scanner (camera + flash + front/back).
   ///
-  /// We start with the default settings. You can tweak resolution,
-  /// detection speed, etc. by passing named arguments here if needed.
   final MobileScannerController _scannerController = MobileScannerController();
 
   /// This method is called each time the scanner sees at least one barcode.
@@ -31,14 +27,11 @@ class _PayPageState extends State<PayPage> {
     final rawValue = barcode.rawValue;
     if (rawValue == null) return;
 
-    // Pause the camera immediately to avoid repeated scans:
     _scannerController.stop();
 
-    // Just print for now—backend logic to come later.
-    debugPrint('🔥 Scanned QR/Barcode: $rawValue');
+    debugPrint('Scanned QR/Barcode: $rawValue');
 
     // TODO: send `rawValue` to your backend to process the payment.
-    //       Once your server confirms success, maybe show a Dialog or navigate back.
   }
 
   @override
@@ -56,7 +49,7 @@ class _PayPageState extends State<PayPage> {
       ),
       body: Column(
         children: [
-          // ── 1) Payment summary ─────────────────────────────────────────────
+          // Payment summary --------------------------------------------
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Text(
@@ -68,21 +61,18 @@ class _PayPageState extends State<PayPage> {
             ),
           ),
 
-          // ── 2) Camera Preview / QR Scanner ─────────────────────────────────
+          // Camera Preview / QR Scanner --------------------------------------------
           Expanded(
             child: MobileScanner(
               controller: _scannerController,
               onDetect: _onDetect,
-              // A simple overlay: darken the screen & cut out a center square with a green border.
               overlayBuilder: (context, constraints) {
                 final scanSize = constraints.maxWidth * 0.8;
                 final horizontalPadding = (constraints.maxWidth - scanSize) / 2;
                 final verticalPadding = (constraints.maxHeight - scanSize) / 2;
                 return Stack(
                   children: [
-                    // Dark overlay over the entire area
                     Container(color: Colors.black.withValues(alpha: 0.4)),
-                    // Transparent square in the center with a green border
                     Positioned(
                       left: horizontalPadding,
                       top: verticalPadding,

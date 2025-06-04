@@ -344,9 +344,9 @@ class _EditBenefitsPageState extends State<EditBenefitsPage> {
           if (index == 0) {
             // Already on Benefits → do nothing
           } else if (index == 1) {
-            Navigator.pushNamed(context, '/current_conditions');
+            Navigator.pushNamed(context, '/currconditions');
           } else if (index == 2) {
-            Navigator.pushNamed(context, '/profile');
+            Navigator.pushNamed(context, '/ownprofile');
           }
         },
         items: const [

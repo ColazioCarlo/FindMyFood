@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-
-import '../auth.dart';
+import 'auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -25,13 +24,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      final user = await AuthService().login(
+      int user = await AuthService().login(
         _usernameController.text,
         _passwordController.text,
         context,
       );
-      if (user != null) {
-        Navigator.pushNamed(context, '/home');
+      if (user == 0) {
+        Navigator.pushNamed(context, '/map');
 
       }
     } else {
@@ -94,7 +93,7 @@ class _LoginScreenState extends State<LoginScreen> {
               RichText(
                 text: TextSpan(
                   text: "I don't have an account... ",
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.black, fontSize: 16),
                   children: [
                     TextSpan(
                       text: 'Go back',

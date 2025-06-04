@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
+import '../login/auth.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _MyProfilePageState();
+}
+
+class _MyProfilePageState extends State<ProfilePage> {
+  final authService = AuthService();
+
+
+  Future<void> _handleRefresh() async {
+    await authService.refreshAccessToken();
+
+  }
+
+  Future<void> _handleLogout() async {
+    Navigator.pushNamed(context, '/login');
+  }
 
   // Example data
   final List<String> _futureReservations = const [
@@ -83,31 +101,23 @@ class ProfilePage extends StatelessWidget {
                               ),
                               alignment: Alignment.center,
                               child: const Text(
-                                '152',
+                                '152€',
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontFamily: 'Actor',
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black,
+
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Text(
-                            '€',
-                            style: TextStyle(
-                              fontSize: 24,
-                              fontFamily: 'Actor',
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black,
-                            ),
-                          ),
+
                         ],
                       ),
                       const SizedBox(height: 24),
 
-                      // "Transfer more funds" title
                       const Text(
                         'Transfer more funds',
                         style: TextStyle(
@@ -119,7 +129,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // "Enter amount:" label
                       const Text(
                         'Enter amount:',
                         style: TextStyle(
@@ -131,7 +140,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // Amount input field
                       SizedBox(
                         height: 50,
                         child: TextField(
@@ -163,6 +171,7 @@ class ProfilePage extends StatelessWidget {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: () {
+                            _handleRefresh();
                             // TODO: connect to backend to process transfer
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -206,7 +215,6 @@ class ProfilePage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // "Future reservations:" title
                       const Text(
                         'Future reservations:',
                         style: TextStyle(
@@ -218,10 +226,9 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // Scrollable list of future reservations
                       Container(
                         constraints: const BoxConstraints(
-                          maxHeight: 200, // keep same size, allow scrolling
+                          maxHeight: 200,
                         ),
                         child: ListView.separated(
                           shrinkWrap: true,
@@ -280,11 +287,10 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // Divider
                       const Divider(color: Colors.grey, thickness: 1),
                       const SizedBox(height: 16),
 
-                      // "Past reservations:" title
+                      // Past reservations
                       const Text(
                         'Past reservations:',
                         style: TextStyle(
@@ -296,7 +302,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      // If no past reservations, show placeholder
                       if (_pastReservations.isEmpty)
                         const Center(
                           child: Text(
@@ -422,7 +427,6 @@ class ProfilePage extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
 
-                      // "Vouchers:" section
                       const Text(
                         'Vouchers:',
                         style: TextStyle(
@@ -489,12 +493,35 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: ElevatedButton(
+                  onPressed: _handleLogout,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008245),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Actor',
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
       ),
 
-      // Bottom navigation bar (“Map”, “List”, “Profile”)
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
         selectedItemColor: Colors.white,

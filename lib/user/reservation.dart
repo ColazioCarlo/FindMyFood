@@ -1,7 +1,5 @@
-// lib/reservation.dart
-
 import 'package:flutter/material.dart';
-import 'profile.dart'; // import your profile screen
+import 'profile.dart';
 
 class ReservationPage extends StatefulWidget {
   final String restaurantName;
@@ -299,14 +297,11 @@ class _ReservationPageState extends State<ReservationPage> {
         currentIndex: 1, // Highlight “List” in black when on Reservation
         onTap: (index) {
           if (index == 0) {
-            Navigator.pushNamed(context, '/home');
+            Navigator.pushNamed(context, '/map');
           } else if (index == 1) {
             Navigator.pushNamed(context, '/list');
           } else if (index == 2) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfilePage()),
-            );
+            Navigator.pushNamed(context, '/userprofile');
           }
         },
         items: const [

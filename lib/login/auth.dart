@@ -1,11 +1,8 @@
 import 'dart:convert';
 import 'dart:ffi';
-import 'package:find_my_food/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
-
-import 'login/login.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -20,7 +17,8 @@ class AuthService {
   String? accessToken;
   String? refreshToken;
 
-  Future<UserModel?> login( //model usera kad ga budemo dobili
+  //LOGIN-------------------------------------------------------
+  Future<int> login( //model usera kad ga budemo dobili
       String username,
       String password,
       BuildContext context,
@@ -41,6 +39,7 @@ class AuthService {
       );
 
       if (loginResponse.statusCode == 200) { //provjerava ako je login ok i daje token
+        Navigator.pushNamed(context, '/map');
         final loginData = jsonDecode(loginResponse.body);
         accessToken = loginData['access_token'];
         refreshToken = loginData['refresh_token'];
@@ -64,13 +63,12 @@ class AuthService {
           _username = username;
           protectedMessage = msg;
         }
-
+        return 0;
 
         ScaffoldMessenger.of(context).showSnackBar( //prikaze poruku od logina
           SnackBar(content: Text(protectedMessage)),
         );
 
-        return UserModel.fromJson(loginData);
       } else {
         print("Login failed: ${loginResponse.statusCode}");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -83,14 +81,15 @@ class AuthService {
         SnackBar(content: Text("Error: $e")),
       );
     }
-    return null;
+    return 1;
   }
 
+  //REGISTER-------------------------------------------------------
   Future<void> register(
       String username,
       String password,
       BuildContext context
-      ) async { //omogucuje asinkrono programiranje
+      ) async {
     final registerUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/register');
 
     final body = {
@@ -115,7 +114,7 @@ class AuthService {
 
         );
 
-        Navigator.pushNamed(context, '/home');   //ako je registracija uspjesna ide na home screen
+        Navigator.pushNamed(context, '/map');   //ako je registracija uspjesna ide na home screen
 
 
       } else {
@@ -134,6 +133,7 @@ class AuthService {
     }
   }
 
+  //REGISTER ZA LOKALE-------------------------------------------------------
   Future<void> registerposlovni(
       String username,
       String password,
@@ -144,7 +144,7 @@ class AuthService {
       Int8 parking,
       String opis,
       BuildContext context,
-      ) async { //omogucuje asinkrono programiranje
+      ) async {
     final registerposlovniUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/registerposlovni'); //ovisi o backendu
 
     final body = {
@@ -175,7 +175,7 @@ class AuthService {
 
         );
 
-        Navigator.pushNamed(context, '/home');
+        Navigator.pushNamed(context, '/currcondition');
 
       } else {
         print("Register failed: ${registerResponse.statusCode}");

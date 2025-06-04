@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'reservation.dart';
-import 'profile.dart'; // import your profile screen
 
+//generiranje itema na listi
 class RestaurantItem extends StatelessWidget {
   final String title;
 
@@ -34,7 +34,6 @@ class RestaurantItem extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1) Restaurant Title
                     Text(
                       title,
                       style: const TextStyle(
@@ -135,6 +134,7 @@ class RestaurantItem extends StatelessWidget {
   }
 }
 
+//lista stranice
 class RestaurantListPage extends StatelessWidget {
   const RestaurantListPage({super.key});
 
@@ -160,7 +160,7 @@ class RestaurantListPage extends StatelessWidget {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
-        selectedItemColor: Colors.white, // “List” is white on this screen
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
         currentIndex: 1, // index 1 = “List”
         onTap: (index) {
@@ -171,10 +171,7 @@ class RestaurantListPage extends StatelessWidget {
             // Already on “List” → do nothing
           } else if (index == 2) {
             // Navigate to Profile
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const ProfilePage()),
-            );
+            Navigator.pushNamed(context, '/userprofile');
           }
         },
         items: const [

@@ -8,7 +8,6 @@ class EditOwnerProfilePage extends StatefulWidget {
 }
 
 class _EditOwnerProfilePageState extends State<EditOwnerProfilePage> {
-  // Controllers for all the text fields
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _emailController    = TextEditingController();
@@ -30,6 +29,10 @@ class _EditOwnerProfilePageState extends State<EditOwnerProfilePage> {
     _parkingController.dispose();
     _descController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogout() async {
+    Navigator.pushNamed(context, '/login');
   }
 
   /// Tapping “Upload” just fills in a placeholder image for now.
@@ -220,7 +223,32 @@ class _EditOwnerProfilePageState extends State<EditOwnerProfilePage> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
+
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _handleLogout,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF008245),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    'Logout',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontFamily: 'Actor',
+                      fontWeight: FontWeight.w400,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -235,9 +263,9 @@ class _EditOwnerProfilePageState extends State<EditOwnerProfilePage> {
         onTap: (index) {
           if (index == 0) {
             // ▶︎ Now navigate to /benefits
-            Navigator.pushNamed(context, '/benefits');
+            Navigator.pushNamed(context, '/currbenefits');
           } else if (index == 1) {
-            Navigator.pushNamed(context, '/current_conditions');
+            Navigator.pushNamed(context, '/currconditions');
           } else if (index == 2) {
             // Already on Profile → do nothing
           }
