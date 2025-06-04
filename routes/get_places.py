@@ -16,8 +16,9 @@ def nearby_places(*args, **kwargs):
     data = request.get_json()
     latitude = data.get("latitude")
     longitude = data.get("longitude")
-    radius = data.get("radius", 1000)  # Default radius is 1000 meters
-    place_type = data.get("type", "restaurant")  # Default search type is restaurant
+    radius = data.get("radius", 1000)
+    place_type = data.get("type", "restaurant")
+    max_results = data.get("max_results", 10)
 
     if not latitude or not longitude:
         return jsonify({"message": "Latitude and longitude are required"}), 400
@@ -28,7 +29,7 @@ def nearby_places(*args, **kwargs):
     headers = {
         "Content-Type": "application/json",
         "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-        "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.rating",
+        "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.rating,places.photos",
     }
     payload = {
         "includedTypes": [place_type],
@@ -59,6 +60,23 @@ def nearby_places(*args, **kwargs):
         business = BusinessUser.query.filter_by(google_place_id=google_place_id).first()
 
         if business:
+            photo_uri = None
+            photos = place.get("photos", [])
+            
+            if photos:
+                photo_name = photos[0].get("name")
+                photo_width = photos[0].get("widthPx")
+                photo_height = photos[0].get("heightPx")
+                
+                if photo_name:
+                    # Build the photo URI with the given parameters
+                    photos_api_url = f"https://places.googleapis.com/v1/{photo_name}/media?key={GOOGLE_MAPS_API_KEY}&maxWidthPx={photo_width}&maxHeightPx={photo_height}&skipHttpRedirect=true"
+
+                    photo_response = requests.get(photos_api_url)
+                    if photo_response.status_code == 200:
+                        photo_json = photo_response.json()
+                        photo_uri = photo_json.get("photoUri")
+            
             matched_places.append(
                 {
                     "name": business.name,
@@ -69,6 +87,7 @@ def nearby_places(*args, **kwargs):
                     "parking_free": business.parkingfree,
                     "opis": business.opis,
                     "rating": place.get("rating"),
+                    "photoUri": photo_uri
                 }
             )
 
