@@ -1,4 +1,4 @@
-import 'package:find_my_food/pocetna.dart';
+import 'package:find_my_food/login/pocetna.dart';
 import 'package:find_my_food/user/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:find_my_food/login/register.dart';
@@ -10,7 +10,7 @@ import 'user/restaurant_list.dart';
 import 'user/reservation.dart';
 import 'user/use_benefits_before_paying.dart';
 import 'user/pay.dart';
-import 'map.dart';
+import 'user/map.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
         '/map': (context) => const MapPage(),
         '/login': (_) => const LoginScreen(),
         '/register': (_) => const RegisterScreen(),
-        '/list': (_) => const RestaurantListPage(),
+        '/list': (_) => RestaurantListPage(),
         '/pocetna': (_) => const MyFirstPage(),
         '/currconditions': (_) => const CurrentConditionsPage(),
         '/currbenefits': (_) => const EditBenefitsPage(),
@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
           final args =
           ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
           return ReservationPage(
-            restaurantName: args['restaurantName'] as String,
+            mjesto: args['mjesto'],
           );
         },
 

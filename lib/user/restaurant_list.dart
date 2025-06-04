@@ -1,16 +1,19 @@
+import '/place.dart';
+import '/user/getPlaces.dart';
 import 'package:flutter/material.dart';
 import 'reservation.dart';
 
 //generiranje itema na listi
 class RestaurantItem extends StatelessWidget {
-  final String title;
+  final PlaceModel mjesto;
 
   const RestaurantItem({
     super.key,
-    required this.title,
+    required this.mjesto,
   });
 
   static const double itemHeight = 250;
+
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +38,7 @@ class RestaurantItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      mjesto.name!,
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -46,34 +49,44 @@ class RestaurantItem extends StatelessWidget {
                     Row(
                       children: [
                         const Text(
-                          'Review:',
+                          'Ocjene:',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                         const SizedBox(width: 8),
-                        Row(
-                          children: List.generate(
-                            4,
-                                (index) => const Icon(
-                              Icons.star,
-                              color: Colors.amber,
-                              size: 20,
-                            ),
+                        Text(
+                          mjesto.rating.toString(),
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
+                        ),
+                        const Icon(
+                          Icons.star,
+                          size: 16,
+                          color: Colors.amber,
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Tables available: 5',
-                      style: TextStyle(fontSize: 16),
+                    Row(
+                      children: [
+                        const Text(
+                          'Slobodno mjesto: ',
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        Text(
+                          mjesto.parkingFree.toString(),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Parking spots left: 10',
-                      style: TextStyle(fontSize: 16),
+                    Text(
+                      mjesto.opis!,
+                      style: const TextStyle(fontSize: 16),
                     ),
                     const Spacer(),
                     Align(
@@ -84,7 +97,7 @@ class RestaurantItem extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  ReservationPage(restaurantName: title),
+                                  ReservationPage(mjesto: mjesto),
                             ),
                           );
                         },
@@ -120,8 +133,8 @@ class RestaurantItem extends StatelessWidget {
                   topRight: Radius.circular(12),
                   bottomRight: Radius.circular(12),
                 ),
-                child: Image.asset(
-                  'assets/images/placeholder.png',
+                child: Image.network(
+                  mjesto.photoUri!,
                   fit: BoxFit.cover,
                   height: double.infinity,
                 ),
@@ -135,34 +148,68 @@ class RestaurantItem extends StatelessWidget {
 }
 
 //lista stranice
-class RestaurantListPage extends StatelessWidget {
-  const RestaurantListPage({super.key});
 
-  static const List<String> _restaurantTitles = [
-    'Restaurant 1',
-    'Restaurant 2',
-    'Restaurant 3',
-    'Restaurant 4',
-    'Restaurant 5',
-  ];
+class RestaurantListPage extends StatefulWidget {
+  RestaurantListPage({super.key}) ;
+
+  @override
+  State<RestaurantListPage> createState() => _RestaurantListPageState();
+}
+
+class _RestaurantListPageState extends State<RestaurantListPage> {
+  late Future<List<PlaceModel>> _restaurants;
+
+  final double longitude = 14.4464342;
+  final double latitude = 45.3273731;
+  final int radius = 5000; //zasad
+
+  @override
+  void initState() {
+    super.initState();
+    _restaurants = GetPlaces().getPlaces(
+      longitude.toString(),
+      latitude.toString(),
+      radius.toString(),
+      null,
+      context,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView.separated(
-        padding: const EdgeInsets.only(top: 16, bottom: 80),
-        itemCount: _restaurantTitles.length,
-        separatorBuilder: (context, index) => const SizedBox(height: 16),
-        itemBuilder: (context, index) {
-          final title = _restaurantTitles[index];
-          return RestaurantItem(title: title);
+
+
+      body: FutureBuilder<List<PlaceModel>>(
+        future: _restaurants,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No restaurants found.'));
+          }
+
+          final restaurants = snapshot.data!;
+
+          return ListView.separated(
+            padding: const EdgeInsets.only(top: 16, bottom: 80),
+            itemCount: restaurants.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final place = restaurants[index];
+              return RestaurantItem(mjesto: place);
+            },
+          );
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF00813E),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.black,
-        currentIndex: 1, // index 1 = “List”
+        currentIndex: 1,
+        // index 1 = “List”
         onTap: (index) {
           if (index == 0) {
             // Navigate to Map
@@ -192,3 +239,4 @@ class RestaurantListPage extends StatelessWidget {
     );
   }
 }
+

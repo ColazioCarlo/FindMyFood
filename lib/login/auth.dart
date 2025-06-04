@@ -11,10 +11,10 @@ class AuthService {
 
   final client = http.Client();
 
-  String? _username;
-  String? get username => _username; //getter za _username
 
-  String? accessToken;
+  String? _accessToken;
+  String? get accessToken => _accessToken;
+
   String? refreshToken;
 
   //LOGIN-------------------------------------------------------
@@ -23,7 +23,7 @@ class AuthService {
       String password,
       BuildContext context,
       ) async { //omogucuje asinkrono programiranje
-    final loginUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/login'); //link od dba
+    final loginUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/login');
     final protectedUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/protected');
 
     final body = {
@@ -41,33 +41,10 @@ class AuthService {
       if (loginResponse.statusCode == 200) { //provjerava ako je login ok i daje token
         Navigator.pushNamed(context, '/map');
         final loginData = jsonDecode(loginResponse.body);
-        accessToken = loginData['access_token'];
+        _accessToken = loginData['access_token'];
         refreshToken = loginData['refresh_token'];
 
-
-        final protectedResponse = await client.get( //get request za username
-          protectedUrl,
-          headers: {'Content-Type': 'application/json',
-            "Authorization": "Bearer $accessToken"   //bearer token
-          },
-
-        );
-
-        String protectedMessage = "Access failed";
-
-        if (protectedResponse.statusCode == 200) { //ako je response ok -> izvadi username iz messagea
-          final responseJson = jsonDecode(protectedResponse.body);
-          final msg = responseJson['message'] as String;
-          final username = msg.split(' ').last;
-
-          _username = username;
-          protectedMessage = msg;
-        }
         return 0;
-
-        ScaffoldMessenger.of(context).showSnackBar( //prikaze poruku od logina
-          SnackBar(content: Text(protectedMessage)),
-        );
 
       } else {
         print("Login failed: ${loginResponse.statusCode}");
@@ -198,7 +175,7 @@ class AuthService {
 
     final refreshUrl = Uri.parse('http://kthreljin.dyndns.biz:8080/refresh');
 
-    if (!JwtDecoder.isExpired(accessToken!)) {  //ako je token valjani ne radi nista
+    if (!JwtDecoder.isExpired(_accessToken!)) {  //ako je token valjani ne radi nista
       print("token je vazeci");
       return;
     }
@@ -216,7 +193,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        accessToken = data['access_token'];
+        _accessToken = data['access_token'];
       } else {
         print('Token refresh failed: ${response.statusCode}');
         return;

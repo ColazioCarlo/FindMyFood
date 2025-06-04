@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'profile.dart';
+import '../place.dart';
 
 class ReservationPage extends StatefulWidget {
-  final String restaurantName;
+  final PlaceModel mjesto;
 
   const ReservationPage({
     super.key,
-    required this.restaurantName,
+    required this.mjesto,
   });
 
   @override
@@ -16,6 +16,7 @@ class ReservationPage extends StatefulWidget {
 class _ReservationPageState extends State<ReservationPage> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
+
 
   String get _dateText {
     if (_selectedDate == null) return 'DD/MM/YYYY';
@@ -73,7 +74,7 @@ class _ReservationPageState extends State<ReservationPage> {
               height: 220,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/placeholder.png'),
+                  image: NetworkImage(widget.mjesto.photoUri!),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -95,7 +96,7 @@ class _ReservationPageState extends State<ReservationPage> {
                       ),
                     ),
                     TextSpan(
-                      text: widget.restaurantName,
+                      text: widget.mjesto.name,
                       style: const TextStyle(
                         color: Colors.black,
                         fontSize: 24,
@@ -211,7 +212,7 @@ class _ReservationPageState extends State<ReservationPage> {
                     context,
                     '/use_benefits',
                     arguments: {
-                      'restaurantName': widget.restaurantName,
+                      'restaurantName': widget.mjesto.name,
                       'reservationDate': _selectedDate!.toIso8601String(),
                       'reservationTime': time24,
                       'fidelityPoints': 150,   // TODO
