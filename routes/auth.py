@@ -165,18 +165,29 @@ def login():
     username = auth["username"]
     password = auth["password"]
 
-    # Query za korisnika u MySQL bazi s danim usernameom
+    # Pokusaj pronaci korisnika u bazi
     user = User.query.filter_by(username=username).first()
+    user_type = "user"
     if user and check_password_hash(user.password, password):
-        # Generiranje access i refresh tokena za uspjesno prijavljenog korisnika
-        access_token = generate_access_token(user)
-        refresh_token = generate_refresh_token(user)
+        pass
+    else:
+        # Ako nije pronaden korisnik, pokusaj pronaci poslovnog korisnika
+        user = BusinessUser.query.filter_by(username=username).first()
+        user_type = "business"
+        if not user or not check_password_hash(user.password, password):
+            return jsonify({"message": "Invalid credentials"}), 401
 
-        return jsonify(
-            {"access_token": access_token, "refresh_token": refresh_token}
-        ), 200
+    # Generiranje access i refresh tokena za uspjesno prijavljenog korisnika
+    access_token = generate_access_token(user)
+    refresh_token = generate_refresh_token(user)
 
-    return jsonify({"message": "Invalid credentials"}), 401
+    return jsonify(
+        {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "user_type": user_type,
+        }
+    ), 200
 
 
 @auth_bp.route("/refresh", methods=["POST"])
