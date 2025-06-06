@@ -177,7 +177,7 @@ def login():
         if not user or not check_password_hash(user.password, password):
             return jsonify({"message": "Invalid credentials"}), 401
 
-    # Generiranje access i refresh tokena za uspjesno prijavljenog korisnika
+     # Generiranje access i refresh tokena za uspjesno prijavljenog korisnika
     access_token = generate_access_token(user)
     refresh_token = generate_refresh_token(user)
 
