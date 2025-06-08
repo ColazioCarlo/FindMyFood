@@ -24,14 +24,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
-      int user = await AuthService().login(
+      String user = await AuthService().login(
         _usernameController.text,
         _passwordController.text,
         context,
       );
-      if (user == 0) {
+      if (user == 'user') {
         Navigator.pushNamed(context, '/map');
-
+      }
+      else if(user == 'business') {
+        Navigator.pushNamed(context, '/currconditions');
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

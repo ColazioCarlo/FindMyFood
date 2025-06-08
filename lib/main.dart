@@ -1,16 +1,16 @@
-import 'package:find_my_food/login/pocetna.dart';
-import 'package:find_my_food/user/profile.dart';
+import 'package:find_my_food/pocetna.dart';
+import 'package:find_my_food/user/profile/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:find_my_food/login/register.dart';
 import 'login/login.dart';
-import 'owner/current_conditions.dart';
-import 'owner/edit_benefits.dart';
-import 'owner/edit_owner_profile.dart';
-import 'user/restaurant_list.dart';
-import 'user/reservation.dart';
-import 'user/use_benefits_before_paying.dart';
-import 'user/pay.dart';
-import 'user/map.dart';
+import 'owner/parking/current_conditions.dart';
+import 'owner/benefits/edit_benefits.dart';
+import 'owner/profile/edit_owner_profile.dart';
+import 'user/list/restaurant_list.dart';
+import 'user/list/reservation/reservation.dart';
+import 'user/list/reservation/pay/use_benefits_before_paying.dart';
+import 'user/list/reservation/pay/pay.dart';
+import 'user/map/map.dart';
 
 void main() {
   runApp(const MyApp());

@@ -18,7 +18,7 @@ class AuthService {
   String? refreshToken;
 
   //LOGIN-------------------------------------------------------
-  Future<int> login( //model usera kad ga budemo dobili
+  Future<String> login( //model usera kad ga budemo dobili
       String username,
       String password,
       BuildContext context,
@@ -44,7 +44,7 @@ class AuthService {
         _accessToken = loginData['access_token'];
         refreshToken = loginData['refresh_token'];
 
-        return 0;
+        return loginData['user_type'];
 
       } else {
         print("Login failed: ${loginResponse.statusCode}");
@@ -58,7 +58,7 @@ class AuthService {
         SnackBar(content: Text("Error: $e")),
       );
     }
-    return 1;
+    return 'null';
   }
 
   //REGISTER-------------------------------------------------------

@@ -81,15 +81,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await _register();
     }
 
-    int user = await AuthService().login(
+    String user = await AuthService().login(
       _usernameController.text,
       _passwordController.text,
       context,
     );
 
-    if (user == 0) {
+    if (user == 'user') {
       Navigator.pushNamed(context, '/map');
-    } else {
+    }
+    else if(user == 'business') {
+      Navigator.pushNamed(context, '/currconditions');
+    }
+    else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
